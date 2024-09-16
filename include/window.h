@@ -17,7 +17,7 @@ public:
   void run();
   void set_display(void (*func)());
   void idle(void (*func)());
-  void key_interrupt(void (*func)(unsigned char, int, int));
+  void key_interrupt(void (*func)(int, int, int));
   void mousePassive(void (*func) (int x, int y));
   void activeMouse(void (*func)(int button, int state, int x, int y));
 

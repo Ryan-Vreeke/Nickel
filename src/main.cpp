@@ -1,38 +1,41 @@
-#include <iostream>
-#include <memory>
+#include "Camera.h"
 #include "EntityCenter.h"
 #include "TransformComponent.h"
 #include "window.h"
+#include <GL/freeglut_std.h>
+#include <iostream>
+#include <memory>
 
 std::unique_ptr<nWindow> window;
 std::unique_ptr<EntityCenter> eCenter(new EntityCenter());
 
 void myDisplay();
 void idle();
-void myKeyboard(unsigned char key, int x, int y);
+void myKeyboard(int key, int x, int y);
 void myMouse(int button, int state, int x, int y);
 void mousePassive(int x, int y);
 
-int main(int argc, char *argv[])
-{
-	window = std::make_unique<nWindow>(800, 800);
-	window->init_window(&argc, argv);
-	window->set_display(myDisplay);
-	window->key_interrupt(myKeyboard);
-	window->mousePassive(mousePassive);
-	window->activeMouse(myMouse);
-	window->idle(idle);
+Camera camera;
+
+int main(int argc, char *argv[]) {
+  window = std::make_unique<nWindow>(1000, 1000);
+  window->init_window(&argc, argv);
+  window->set_display(myDisplay);
+  window->key_interrupt(myKeyboard);
+  window->mousePassive(mousePassive);
+  window->activeMouse(myMouse);
+  window->idle(idle);
+
 
   uint32_t entity = eCenter->createEntity();
-	TransformComponent transform;
-	transform.pos = glm::vec3{0, 0, 0};
+  TransformComponent transform;
+  transform.pos = glm::vec3{0, 0, 0};
   eCenter->transformComponents[entity] = transform;
 
-  eCenter->makeSystems(argv[1]);
+  eCenter->makeSystems(camera);
   eCenter->run();
   window->run();
-	// Your program logic here
-	return 0;
+  return 0;
 }
 
 void myDisplay() {
@@ -46,21 +49,39 @@ void idle() {
   glutPostRedisplay();
 }
 
-void myKeyboard(unsigned char key, int x, int y) {
+void myKeyboard(int key, int x, int y) {
   switch (key) {
-  case 27://ESCAPE KEY
-    glutLeaveMainLoop();
+  case GLUT_KEY_RIGHT: // ESCAPE KEY
+    std::cout << "right " << camera.pos.z << std::endl;
+    break;
+  case GLUT_KEY_LEFT:
+    glutWarpPointer(centerX, centerY);
+    std::cout << "left" << std::endl;
     break;
   }
 
   glutPostRedisplay();
 }
 
+float lastX = 1.0f;
+float lastY = 0;
+bool firstMouse = true;
+
 void myMouse(int button, int state, int x, int y) {}
 
-void mousePassive(int x, int y) { 
-  float fX = (x/(float)window->width) - 0.5f;
-  float fy = (y/(float)window->height) - 0.5f;
+void mousePassive(int x, int y) {
+  if (firstMouse) {
+    lastX = x;
+    lastY = y;
+    firstMouse = false;
+  }
 
-  printf("x: %f, y: %f\n", fX, fy); 
+  float xoffset = lastX - x;
+
+  lastX = x;
+  lastY = y;
+
+  camera.look(xoffset / 10.0f, 0.0f);
+
+  glutPostRedisplay();
 }

@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include <unordered_map>
+#include "Camera.h"
 #include "Render.h"
 #include "TransformComponent.h"
 
@@ -18,7 +19,7 @@ public:
 
   uint32_t createEntity();
   void deleteEntity(uint32_t eID);
-  void makeSystems(const char *obj);
+  void makeSystems(Camera &camera);
   void run();
   
   std::unordered_map<uint32_t, TransformComponent> transformComponents;
