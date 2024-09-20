@@ -1,87 +1,144 @@
 #include "Camera.h"
 #include "EntityCenter.h"
-#include "TransformComponent.h"
 #include "window.h"
-#include <GL/freeglut_std.h>
-#include <iostream>
+#include <GLFW/glfw3.h>
 #include <memory>
 
 std::unique_ptr<nWindow> window;
 std::unique_ptr<EntityCenter> eCenter(new EntityCenter());
 
-void myDisplay();
-void idle();
-void myKeyboard(int key, int x, int y);
-void myMouse(int button, int state, int x, int y);
-void mousePassive(int x, int y);
+void renderLoop();
+void keyCallback(GLFWwindow *window, int key, int scancode, int action,
+                 int mods);
+void mouseMoveCallback(GLFWwindow *window, double xpos, double ypos);
+void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods);
+void scrollCallback(GLFWwindow *window, double xoffset, double yoffset);
 
-Camera camera;
+Camera camera{glm::vec3{0.0, 0.0, -0.5}, 0, 0};
+
+double lastX = 0;
+double lastY = 0;
+bool firstMouse = true;
 
 int main(int argc, char *argv[]) {
   window = std::make_unique<nWindow>(1000, 1000);
   window->init_window(&argc, argv);
-  window->set_display(myDisplay);
-  window->key_interrupt(myKeyboard);
-  window->mousePassive(mousePassive);
-  window->activeMouse(myMouse);
-  window->idle(idle);
 
+  window->idle(renderLoop);
+  window->keyCallback(keyCallback);
+  window->mousePassiveCallback(mouseMoveCallback);
+  window->scrollCallback(scrollCallback);
+  window->mouseActiveCallback(mouseButtonCallback);
 
   uint32_t entity = eCenter->createEntity();
   TransformComponent transform;
   transform.pos = glm::vec3{0, 0, 0};
   eCenter->transformComponents[entity] = transform;
 
+
+  entity = eCenter->createEntity();
+  transform.pos = glm::vec3{1, 0, 0};
+  eCenter->transformComponents[entity] = transform;
+
   eCenter->makeSystems(camera);
-  eCenter->run();
   window->run();
   return 0;
 }
 
-void myDisplay() {
-  eCenter->run();
-  glutSwapBuffers();
+bool forward, back, left, right;
+double now; 
+double delta;
+double lastTime;
+
+void handleMove() {
+  float speed = 1.0 * delta;
+
+  if (forward) {
+    camera.move(0.0, speed);
+  }
+  if (back) {
+    camera.move(0.0, -speed);
+  }
+  if (left) {
+    camera.move(-speed, 0.0);
+  }
+  if (right) {
+    camera.move(speed, 0.0);
+  }
 }
 
-void idle() {
-  // animations
-  // redraw
-  glutPostRedisplay();
+
+void renderLoop() {
+  now = glfwGetTime();
+  delta = now - lastTime;
+  lastTime = now;
+
+  handleMove();
+  camera.update();
+  eCenter->render();
 }
 
-void myKeyboard(int key, int x, int y) {
-  switch (key) {
-  case GLUT_KEY_RIGHT: // ESCAPE KEY
-    std::cout << "right " << camera.pos.z << std::endl;
-    break;
-  case GLUT_KEY_LEFT:
-    glutWarpPointer(centerX, centerY);
-    std::cout << "left" << std::endl;
-    break;
+void mousePassive(int x, int y) {}
+
+void keyCallback(GLFWwindow *window, int key, int scancode, int action,
+                 int mods) {
+  if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+    glfwSetWindowShouldClose(window, true);
   }
 
-  glutPostRedisplay();
+  if (action == GLFW_PRESS) {
+    switch (key) {
+    case GLFW_KEY_W:
+      forward = true;
+      break;
+    case GLFW_KEY_S:
+      back = true;
+      break;
+    case GLFW_KEY_A:
+      left = true;
+      break;
+    case GLFW_KEY_D:
+      right = true;
+      break;
+    }
+    return;
+  }
+
+  if (action == GLFW_RELEASE) {
+    switch (key) {
+    case GLFW_KEY_W:
+      forward = false;
+      break;
+    case GLFW_KEY_S:
+      back = false;
+      break;
+    case GLFW_KEY_A:
+      left = false;
+      break;
+    case GLFW_KEY_D:
+      right = false;
+      break;
+    }
+  }
 }
 
-float lastX = 1.0f;
-float lastY = 0;
-bool firstMouse = true;
-
-void myMouse(int button, int state, int x, int y) {}
-
-void mousePassive(int x, int y) {
+void mouseMoveCallback(GLFWwindow *window, double xpos, double ypos) {
   if (firstMouse) {
-    lastX = x;
-    lastY = y;
+    lastX = xpos;
+    lastY = ypos;
     firstMouse = false;
   }
 
-  float xoffset = lastX - x;
+  float xoffset = xpos - lastX;
+  float yoffset = lastY - ypos;
 
-  lastX = x;
-  lastY = y;
+  lastX = xpos;
+  lastY = ypos;
 
-  camera.look(xoffset / 10.0f, 0.0f);
-
-  glutPostRedisplay();
+  camera.look(xoffset / 10.0f, yoffset / 10.0f);
 }
+
+void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
+}
+
+void scrollCallback(GLFWwindow *window, double xoffset, double yoffset) {}

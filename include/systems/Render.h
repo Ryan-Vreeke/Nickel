@@ -10,7 +10,7 @@
 #include <glm/vec3.hpp>   // glm::vec3
 #include <glm/vec4.hpp>   // glm::vec4
 #include "../../external/cyCodeBase/cyGL.h"
-#include "../TransformComponent.h"
+#include "Components.h"
 #include <unordered_map>
 #include "Camera.h"
 

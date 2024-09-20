@@ -1,10 +1,12 @@
 #pragma once
 
+#include <functional>
+#define GLFW_INCLUDE_NONE
 #include <GL/glew.h>
-#include <GL/freeglut.h>
 #include <GL/glext.h>
+#include <GLFW/glfw3.h>
 
-class nWindow{
+class nWindow {
 public:
   unsigned int width;
   unsigned int height;
@@ -13,14 +15,16 @@ public:
   nWindow(unsigned int _width, unsigned int _height);
   ~nWindow();
 
-  void init_window(int *argc, char *argv[]);
+  int init_window(int *argc, char *argv[]);
   void run();
-  void set_display(void (*func)());
-  void idle(void (*func)());
-  void key_interrupt(void (*func)(int, int, int));
-  void mousePassive(void (*func) (int x, int y));
-  void activeMouse(void (*func)(int button, int state, int x, int y));
+  void idle(std::function<void()>);
+  void mousePassiveCallback(void (*passive)(GLFWwindow *, double, double));
+  void mouseActiveCallback(void (*cb)(GLFWwindow *, int, int, int));
+  void scrollCallback(void (*cb)(GLFWwindow *, double, double));
+  void keyCallback(void (*cb)(GLFWwindow *, int, int, int, int));
 
 private:
-  int window;
+  GLFWwindow *window;
+  std::function<void()> idleCB;
+
 };

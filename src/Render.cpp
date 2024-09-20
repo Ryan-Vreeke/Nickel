@@ -86,7 +86,6 @@ void Render::draw() {
   // rendering
   glBindVertexArray(VAO);
   glDrawElementsInstanced(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0, object_count);
-  /*glDrawArraysInstanced(GL_TRIANGLES, 0, 36, object_count);*/
   glBindVertexArray(0);
 }
 

@@ -30,4 +30,4 @@ void EntityCenter::makeSystems(Camera &camera) {
   render_system = std::make_unique<Render>(camera);
 }
 
-void EntityCenter::run() { render_system->update(transformComponents); }
+void EntityCenter::render() { render_system->update(transformComponents); }

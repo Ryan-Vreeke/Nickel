@@ -1,6 +1,5 @@
 #include "window.h"
-
-#include <GL/freeglut_std.h>
+#include <GLFW/glfw3.h>
 
 nWindow::nWindow() {
   width = 800;
@@ -10,31 +9,71 @@ nWindow::nWindow() {
 nWindow::nWindow(unsigned int _width, unsigned int _height)
     : width(_width), height(_height) {}
 
-nWindow::~nWindow() {}
-
-void nWindow::init_window(int *argc, char *argv[]) {
-  glutInit(argc, argv);
-  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-  glutInitWindowSize(width, height);
-
-  window = glutCreateWindow("Vox Game");
-  glewInit();
+nWindow::~nWindow() {
+  glfwDestroyWindow(window);
+  glfwTerminate();
 }
 
-void nWindow::run() { glutMainLoop(); }
+int nWindow::init_window(int *argc, char *argv[]) {
+  if (!glfwInit()) {
+    return -1;
+  }
 
-void nWindow::set_display(void (*func)()) { glutDisplayFunc(func); }
+  glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
 
-void nWindow::idle(void (*func)()) { glutIdleFunc(func); }
+  glfwWindowHint(GLFW_RED_BITS, 8); // Set RGBA color depth
+  glfwWindowHint(GLFW_GREEN_BITS, 8);
+  glfwWindowHint(GLFW_BLUE_BITS, 8);
+  glfwWindowHint(GLFW_ALPHA_BITS, 8);
+  glfwWindowHint(GLFW_DEPTH_BITS, 24); // Set depth buffer size
 
-void nWindow::key_interrupt(void (*func)(int, int, int)) {
-  glutSpecialFunc(func);
+  window = glfwCreateWindow(width, height, "Nickel", NULL, NULL);
+  if (!window) {
+    glfwTerminate();
+    return -1;
+  }
+
+  glfwMakeContextCurrent(window);
+  glfwSwapInterval(1);
+
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+  glewExperimental = GL_TRUE;
+  if (glewInit() != GLEW_OK) {
+    return -1;
+  }
+
+  return 0;
 }
 
-void nWindow::mousePassive(void (*func)(int x, int y)) {
-  glutPassiveMotionFunc(func);
+void nWindow::run() {
+  while (!glfwWindowShouldClose(window)) {
+    idleCB();
+
+    glfwSwapBuffers(window);
+    glfwPollEvents();
+  }
 }
 
-void nWindow::activeMouse(void (*func)(int button, int state, int x, int y)) {
-  glutMouseFunc(func);
+void nWindow::idle(std::function<void()> func) { idleCB = func; }
+
+void nWindow::mousePassiveCallback(void (*passive)(GLFWwindow *, double, double)) {
+  glfwSetCursorPosCallback(window, passive);
 }
+
+void nWindow::mouseActiveCallback(void (*cb)(GLFWwindow *, int, int, int)) {
+  glfwSetMouseButtonCallback(window, cb);
+}
+
+void nWindow::scrollCallback(void (*cb)(GLFWwindow *, double, double)) {
+  glfwSetScrollCallback(window, cb);
+}
+
+void nWindow::keyCallback(void (*cb)(GLFWwindow *, int, int, int, int)) {
+  glfwSetKeyCallback(window, cb);
+}
+
