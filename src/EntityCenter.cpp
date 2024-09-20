@@ -1,7 +1,6 @@
 #include "EntityCenter.h"
 
 #include <algorithm>
-#include <iostream>
 #include <memory>
 
 EntityCenter::EntityCenter() {}
