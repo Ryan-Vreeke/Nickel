@@ -1,6 +1,7 @@
 #include "Render.h"
 #include <GL/gl.h>
 #include <GL/glext.h>
+#include <cstdint>
 #include <glm/ext/quaternion_transform.hpp>
 #include <glm/fwd.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -10,12 +11,12 @@ Render::Render(Camera &camera) : camera(camera) {
          program.BuildFiles("../shaders/vert.vert", "../shaders/shader.frag"));
   glEnable(GL_DEPTH_TEST);
 
-  projection = glm::perspective(glm::radians(60.0f), // Field of view
+  projection = glm::perspective(glm::radians(80.0f), // Field of view
                                 800.0f / 800.0f,     // Aspect ratio
                                 0.1f, 100.0f         // Near and far planes
   );
 
-  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  glClearColor(0.43f, 0.69f, 1.0f, 1.0f);
   glGenVertexArrays(1, &VAO);
   glBindVertexArray(VAO);
 
@@ -43,13 +44,11 @@ Render::~Render() {
   glDeleteBuffers(1, &EBO);
 }
 
-void Render::update(
-    std::unordered_map<unsigned int, TransformComponent> &transformComponent) {
+void Render::update( std::unordered_map<uint32_t, PositionComponent> &posEntities) {
   std::vector<glm::mat4> blocks;
 
-  for (std::pair<unsigned int, TransformComponent> entity :
-       transformComponent) {
-    blocks.push_back(get_model(entity.second.pos));
+  for (std::pair<uint32_t, PositionComponent> entity : posEntities) {
+    blocks.push_back(get_model(entity.second.pos, entity.second.scale));
   }
 
   object_count = blocks.size();
@@ -89,8 +88,7 @@ void Render::draw() {
   glBindVertexArray(0);
 }
 
-glm::mat4 Render::get_model(glm::vec3 pos) {
+glm::mat4 Render::get_model(glm::vec3 pos, glm::vec3 scaleVec) {
   glm::mat4 translated = translate(glm::mat4(1.0f), pos);
-  return glm::rotate(scale(translated, glm::vec3(0.5f)), 45.0f,
-                     glm::vec3(1.0f, 0.0f, 0.0f));
+  return glm::scale(translated, scaleVec);
 }

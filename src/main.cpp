@@ -2,10 +2,12 @@
 #include "EntityCenter.h"
 #include "window.h"
 #include <GLFW/glfw3.h>
+#include <cstdint>
+#include <glm/fwd.hpp>
 #include <memory>
+#include "Scene.h"
 
 std::unique_ptr<nWindow> window;
-std::unique_ptr<EntityCenter> eCenter(new EntityCenter());
 
 void renderLoop();
 void keyCallback(GLFWwindow *window, int key, int scancode, int action,
@@ -14,8 +16,9 @@ void mouseMoveCallback(GLFWwindow *window, double xpos, double ypos);
 void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods);
 void scrollCallback(GLFWwindow *window, double xoffset, double yoffset);
 
-Camera camera{glm::vec3{0.0, 0.0, -0.5}, 0, 0};
+uint32_t entity;
 
+Scene scene;
 double lastX = 0;
 double lastY = 0;
 bool firstMouse = true;
@@ -30,52 +33,38 @@ int main(int argc, char *argv[]) {
   window->scrollCallback(scrollCallback);
   window->mouseActiveCallback(mouseButtonCallback);
 
-  uint32_t entity = eCenter->createEntity();
-  TransformComponent transform;
-  transform.pos = glm::vec3{0, 0, 0};
-  eCenter->transformComponents[entity] = transform;
 
+  scene.eCenter->makeSystems(scene.camera);
+  scene.eCenter->run();
 
-  entity = eCenter->createEntity();
-  transform.pos = glm::vec3{1, 0, 0};
-  eCenter->transformComponents[entity] = transform;
-
-  eCenter->makeSystems(camera);
+  scene.buildTerrain();
   window->run();
   return 0;
 }
 
-bool forward, back, left, right;
-double now; 
-double delta;
-double lastTime;
+bool forward, back, left, right, obj_right;
 
 void handleMove() {
-  float speed = 1.0 * delta;
-
+  float speed = 4.0 * scene.eCenter->deltaTime;
   if (forward) {
-    camera.move(0.0, speed);
+    scene.camera.move(0.0, speed);
   }
   if (back) {
-    camera.move(0.0, -speed);
+    scene.camera.move(0.0, -speed);
   }
   if (left) {
-    camera.move(-speed, 0.0);
+    scene.camera.move(-speed, 0.0);
   }
   if (right) {
-    camera.move(speed, 0.0);
+    scene.camera.move(speed, 0.0);
   }
+
 }
 
-
 void renderLoop() {
-  now = glfwGetTime();
-  delta = now - lastTime;
-  lastTime = now;
-
   handleMove();
-  camera.update();
-  eCenter->render();
+  scene.camera.update();
+  scene.eCenter->render();
 }
 
 void mousePassive(int x, int y) {}
@@ -135,7 +124,7 @@ void mouseMoveCallback(GLFWwindow *window, double xpos, double ypos) {
   lastX = xpos;
   lastY = ypos;
 
-  camera.look(xoffset / 10.0f, yoffset / 10.0f);
+  scene.camera.look(xoffset * scene.eCenter->deltaTime * 10, yoffset * scene.eCenter->deltaTime * 10);
 }
 
 void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {

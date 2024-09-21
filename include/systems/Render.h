@@ -1,18 +1,17 @@
 #pragma once
 
+#include "Camera.h"
+#include "Components.h"
 #include <GL/glew.h>
-#include <GL/freeglut.h>
-
+#include "cyGL.h"
+#include <cstdint>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/mat4x4.hpp> // glm::mat4
 #include <glm/vec3.hpp>   // glm::vec3
 #include <glm/vec4.hpp>   // glm::vec4
-#include "../../external/cyCodeBase/cyGL.h"
-#include "Components.h"
 #include <unordered_map>
-#include "Camera.h"
 
 inline float cubeVertices[] = {
     // Front face
@@ -79,13 +78,13 @@ public:
   Render(Camera &camera);
   ~Render();
 
-  void update(std::unordered_map<unsigned int, TransformComponent> &transformComponent);
+  void
+  update(std::unordered_map<uint32_t, PositionComponent> &transformComponent);
 
 private:
   glm::mat4 view;
   int object_count;
 
-
-  glm::mat4 get_model(glm::vec3 pos);
+  glm::mat4 get_model(glm::vec3 pos, glm::vec3 scale);
   void draw();
 };

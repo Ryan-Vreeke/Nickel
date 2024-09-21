@@ -1,7 +1,10 @@
 #include "EntityCenter.h"
 
+#include <GLFW/glfw3.h>
 #include <algorithm>
-#include <memory>
+#include <chrono>
+#include <cstdint>
+#include <thread>
 
 EntityCenter::EntityCenter() {}
 
@@ -27,6 +30,29 @@ void EntityCenter::deleteEntity(uint32_t eID) {
 
 void EntityCenter::makeSystems(Camera &camera) {
   render_system = std::make_unique<Render>(camera);
+  movement_system = std::make_unique<MovementSystem>();
 }
 
-void EntityCenter::render() { render_system->update(transformComponents); }
+void EntityCenter::move(uint32_t entity, float x, float y, float speed) {
+  movementComponents[entity].dir = {x, 0.0f, y};
+  movementComponents[entity].speed = speed * deltaTime;
+  movement_system->moveEntities(entity, movementComponents);
+}
+
+void EntityCenter::render() {
+  now = glfwGetTime();
+  deltaTime = now - lastTime;
+  lastTime = now;
+
+  render_system->update(positionComponents);
+}
+
+void EntityCenter::run() {
+  std::thread thread([&]() -> void {
+    while (1) {
+      movement_system -> update(movementComponents, positionComponents);
+      std::this_thread::sleep_for(std::chrono::milliseconds(17));
+    }
+  });
+  thread.detach();
+}
