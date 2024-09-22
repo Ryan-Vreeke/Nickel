@@ -80,7 +80,7 @@ void Render::draw() {
   glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera.getView()));
   glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
-  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  /*glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);*/
 
   // rendering
   glBindVertexArray(VAO);

@@ -1,11 +1,11 @@
 #include "Camera.h"
 #include "EntityCenter.h"
+#include "Scene.h"
 #include "window.h"
 #include <GLFW/glfw3.h>
 #include <cstdint>
 #include <glm/fwd.hpp>
 #include <memory>
-#include "Scene.h"
 
 std::unique_ptr<nWindow> window;
 
@@ -33,7 +33,6 @@ int main(int argc, char *argv[]) {
   window->scrollCallback(scrollCallback);
   window->mouseActiveCallback(mouseButtonCallback);
 
-
   scene.eCenter->makeSystems(scene.camera);
   scene.eCenter->run();
 
@@ -45,20 +44,19 @@ int main(int argc, char *argv[]) {
 bool forward, back, left, right, obj_right;
 
 void handleMove() {
-  float speed = 4.0 * scene.eCenter->deltaTime;
+  float speed = 10.0 * scene.eCenter->deltaTime;
   if (forward) {
-    scene.camera.move(0.0, speed);
+    scene.movePlayer(0.0, speed);
   }
   if (back) {
-    scene.camera.move(0.0, -speed);
+    scene.movePlayer(0.0, -speed);
   }
   if (left) {
-    scene.camera.move(-speed, 0.0);
+    scene.movePlayer(-speed, 0.0);
   }
   if (right) {
-    scene.camera.move(speed, 0.0);
+    scene.movePlayer(speed, 0.0);
   }
-
 }
 
 void renderLoop() {
@@ -124,7 +122,8 @@ void mouseMoveCallback(GLFWwindow *window, double xpos, double ypos) {
   lastX = xpos;
   lastY = ypos;
 
-  scene.camera.look(xoffset * scene.eCenter->deltaTime * 10, yoffset * scene.eCenter->deltaTime * 10);
+  scene.camera.look(xoffset * scene.eCenter->deltaTime * 10,
+                    yoffset * scene.eCenter->deltaTime * 10);
 }
 
 void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
