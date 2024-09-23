@@ -29,8 +29,8 @@ public:
   void run();
   void move(uint32_t entity, float x, float y, float speed);
 
-  std::unordered_map<uint32_t, PositionComponent> positionComponents;
-  std::unordered_map<uint32_t, MovementComponent> movementComponents;
+  std::unordered_map<uint32_t, PositionComponent> position;
+  std::unordered_map<uint32_t, MovementComponent> movement;
 
 private:
   uint32_t current_entity = 0;

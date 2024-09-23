@@ -91,8 +91,7 @@ void keyCallback(GLFWwindow *window, int key, int scancode, int action,
     return;
   }
 
-  if (action == GLFW_RELEASE) {
-    switch (key) {
+  if (action == GLFW_RELEASE) { switch (key) {
     case GLFW_KEY_W:
       forward = false;
       break;
