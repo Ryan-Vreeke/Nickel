@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Camera.h"
 #include "Components.h"
 #include <GL/glew.h>
 #include "cyGL.h"
@@ -12,6 +11,22 @@
 #include <glm/vec3.hpp>   // glm::vec3
 #include <glm/vec4.hpp>   // glm::vec4
 #include <unordered_map>
+
+class RenderSystem{
+public:
+  GLuint buffer;
+  GLuint models_buffer;
+  GLuint VAO;
+  GLuint EBO;
+  cy::GLSLProgram program;
+  glm::mat4 projection;
+
+  RenderSystem();
+  ~RenderSystem();
+
+  void render(std::unordered_map<uint32_t, CTransform> transform);
+};
+
 
 inline float cubeVertices[] = {
     // Front face
@@ -58,27 +73,3 @@ inline unsigned int cubeIndices[] = {
     12, 13, 14, 14, 15, 12,
     16, 17, 18, 18, 19, 16,
     20, 21, 22, 22, 23, 20};
-
-class Render {
-public:
-  GLuint buffer;
-  GLuint models_buffer;
-  GLuint VAO;
-  GLuint EBO;
-  cy::GLSLProgram program;
-  glm::mat4 projection;
-  Camera &camera;
-
-  Render(Camera &camera);
-  ~Render();
-
-  void
-  update(std::unordered_map<uint32_t, PositionComponent> &transformComponent);
-
-private:
-  glm::mat4 view;
-  int object_count;
-
-  glm::mat4 get_model(glm::vec3 pos, glm::vec3 scale);
-  void draw();
-};

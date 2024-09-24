@@ -1,15 +1,14 @@
 #pragma once
 
 #include <glm/ext.hpp>
+#include <glm/ext/vector_float3.hpp>
 
-struct PositionComponent {
+struct CTransform {
   glm::vec3 pos;
-  glm::vec3 scale;
 };
 
-struct MovementComponent{
-  glm::vec3 dir;
-  float speed;
+struct CCamera{
+  double theta;
+  double phi;
+  glm::mat4 look_model;
 };
-
-

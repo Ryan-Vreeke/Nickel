@@ -1,12 +1,7 @@
-#include "Render.h"
-#include <GL/gl.h>
-#include <GL/glext.h>
-#include <cstdint>
-#include <glm/ext/quaternion_transform.hpp>
-#include <glm/fwd.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include "SRender.h"
 
-Render::Render(Camera &camera) : camera(camera) {
+
+RenderSystem::RenderSystem() : camera(camera) {
   printf("%d\n",
          program.BuildFiles("../shaders/vert.vert", "../shaders/shader.frag"));
   glEnable(GL_DEPTH_TEST);
@@ -38,13 +33,13 @@ Render::Render(Camera &camera) : camera(camera) {
   glBindVertexArray(0);
 }
 
-Render::~Render() {
+RenderSystem::~RenderSystem() {
   glDeleteVertexArrays(1, &VAO);
   glDeleteBuffers(1, &buffer);
   glDeleteBuffers(1, &EBO);
 }
 
-void Render::update( std::unordered_map<uint32_t, PositionComponent> &posEntities) {
+void RenderSystem::render(std::unordered_map<uint32_t, CTransform> &transform) {
   std::vector<glm::mat4> blocks;
 
   for (std::pair<uint32_t, PositionComponent> entity : posEntities) {
@@ -92,3 +87,4 @@ glm::mat4 Render::get_model(glm::vec3 pos, glm::vec3 scaleVec) {
   glm::mat4 translated = translate(glm::mat4(1.0f), pos);
   return glm::scale(translated, scaleVec);
 }
+

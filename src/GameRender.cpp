@@ -1,5 +1,4 @@
-#include "window.h"
-#include <GLFW/glfw3.h>
+#include "GameRender.h"
 
 nWindow::nWindow() {
   width = 800;
@@ -14,7 +13,7 @@ nWindow::~nWindow() {
   glfwTerminate();
 }
 
-int nWindow::init_window(int *argc, char *argv[]) {
+int nWindow::init_window() {
   if (!glfwInit()) {
     return -1;
   }
@@ -50,18 +49,12 @@ int nWindow::init_window(int *argc, char *argv[]) {
   return 0;
 }
 
-void nWindow::run() {
-  while (!glfwWindowShouldClose(window)) {
-    idleCB();
+void nWindow::windowEvents() { glfwPollEvents(); }
 
-    glfwSwapBuffers(window);
-    glfwPollEvents();
-  }
-}
+void nWindow::swap() { glfwSwapBuffers(window); }
 
-void nWindow::idle(std::function<void()> func) { idleCB = func; }
-
-void nWindow::mousePassiveCallback(void (*passive)(GLFWwindow *, double, double)) {
+void nWindow::mousePassiveCallback(void (*passive)(GLFWwindow *, double,
+                                                   double)) {
   glfwSetCursorPosCallback(window, passive);
 }
 
@@ -76,4 +69,3 @@ void nWindow::scrollCallback(void (*cb)(GLFWwindow *, double, double)) {
 void nWindow::keyCallback(void (*cb)(GLFWwindow *, int, int, int, int)) {
   glfwSetKeyCallback(window, cb);
 }
-
