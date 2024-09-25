@@ -1,4 +1,5 @@
 #include "SRender.h"
+#include "Components.h"
 
 
 RenderSystem::RenderSystem() : camera(camera) {
@@ -39,11 +40,11 @@ RenderSystem::~RenderSystem() {
   glDeleteBuffers(1, &EBO);
 }
 
-void RenderSystem::render(std::unordered_map<uint32_t, CTransform> &transform) {
+void RenderSystem::render(std::unordered_map<uint32_t, CTransform> &transform, CCamera camera) {
   std::vector<glm::mat4> blocks;
 
-  for (std::pair<uint32_t, PositionComponent> entity : posEntities) {
-    blocks.push_back(get_model(entity.second.pos, entity.second.scale));
+  for (const auto& [entity, component] : transform) {
+    blocks.push_back(get_model(component.pos));
   }
 
   object_count = blocks.size();
@@ -62,10 +63,10 @@ void RenderSystem::render(std::unordered_map<uint32_t, CTransform> &transform) {
   }
 
   glBindVertexArray(0);
-  draw();
+  draw(camera);
 }
 
-void Render::draw() {
+void RenderSystem::draw(CCamera camera) {
   program.Bind();
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -83,8 +84,8 @@ void Render::draw() {
   glBindVertexArray(0);
 }
 
-glm::mat4 Render::get_model(glm::vec3 pos, glm::vec3 scaleVec) {
+glm::mat4 RenderSystem::get_model(glm::vec3 pos) {
   glm::mat4 translated = translate(glm::mat4(1.0f), pos);
-  return glm::scale(translated, scaleVec);
+  return glm::scale(translated, glm::vec3(1.0f));
 }
 

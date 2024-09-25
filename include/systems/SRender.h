@@ -18,13 +18,16 @@ public:
   GLuint models_buffer;
   GLuint VAO;
   GLuint EBO;
+  size_t object_count;
   cy::GLSLProgram program;
   glm::mat4 projection;
 
   RenderSystem();
   ~RenderSystem();
 
-  void render(std::unordered_map<uint32_t, CTransform> transform);
+  void render(std::unordered_map<uint32_t, CTransform> &transform);
+  void draw();
+  glm::mat4 get_model(glm::vec3 pos);
 };
 
 
@@ -72,4 +75,5 @@ inline unsigned int cubeIndices[] = {
     8, 9, 10, 10, 11, 8,
     12, 13, 14, 14, 15, 12,
     16, 17, 18, 18, 19, 16,
-    20, 21, 22, 22, 23, 20};
+    20, 21, 22, 22, 23, 20
+};

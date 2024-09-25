@@ -45,6 +45,7 @@ void create_window() {
   window->mouseActiveCallback(Controller::mouseButtonCallback);
 }
 
+Scene s;
 int main() {
   using clock = std::chrono::high_resolution_clock;
 
