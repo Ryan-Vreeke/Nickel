@@ -1,8 +1,9 @@
 #include "SRender.h"
 #include "Components.h"
 
+RenderSystem::RenderSystem() {}
 
-RenderSystem::RenderSystem() : camera(camera) {
+void RenderSystem::init() {
   printf("%d\n",
          program.BuildFiles("../shaders/vert.vert", "../shaders/shader.frag"));
   glEnable(GL_DEPTH_TEST);
@@ -40,11 +41,12 @@ RenderSystem::~RenderSystem() {
   glDeleteBuffers(1, &EBO);
 }
 
-void RenderSystem::render(std::unordered_map<uint32_t, CTransform> &transform, CCamera camera) {
+void RenderSystem::render(std::unordered_map<uint32_t, CTransform> &transform,
+                          CCamera &camera, std::vector<uint32_t> entities) {
   std::vector<glm::mat4> blocks;
 
-  for (const auto& [entity, component] : transform) {
-    blocks.push_back(get_model(component.pos));
+  for (const auto &e : entities) {
+    blocks.push_back(get_model(transform[e].pos));
   }
 
   object_count = blocks.size();
@@ -66,14 +68,14 @@ void RenderSystem::render(std::unordered_map<uint32_t, CTransform> &transform, C
   draw(camera);
 }
 
-void RenderSystem::draw(CCamera camera) {
+void RenderSystem::draw(CCamera &camera) {
   program.Bind();
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   GLuint viewLoc = glGetUniformLocation(program.GetID(), "view");
   GLuint projLoc = glGetUniformLocation(program.GetID(), "projection");
 
-  glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera.getView()));
+  glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera.look_model));
   glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
   /*glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);*/
@@ -88,4 +90,3 @@ glm::mat4 RenderSystem::get_model(glm::vec3 pos) {
   glm::mat4 translated = translate(glm::mat4(1.0f), pos);
   return glm::scale(translated, glm::vec3(1.0f));
 }
-

@@ -24,11 +24,7 @@ find_package(glfw3 3.4 REQUIRED)
 
 # Set source files for the main project
 file(GLOB SOURCES src/*.cpp)
-list(REMOVE_ITEM SOURCES ${CMAKE_SOURCE_DIR}/src/main.cpp)
-
-# Add the main executable
-add_executable(Nickel src/main.cpp ${SOURCES})
-
+add_executable(Nickel ${SOURCES})
 # Link external libraries to the main executable
 target_link_libraries(Nickel ${GLEW_LIBRARIES})
 target_link_libraries(Nickel glfw)

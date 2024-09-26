@@ -25,8 +25,9 @@ public:
   RenderSystem();
   ~RenderSystem();
 
-  void render(std::unordered_map<uint32_t, CTransform> &transform);
-  void draw();
+  void render(std::unordered_map<uint32_t, CTransform> &transform, CCamera &camera, std::vector<uint32_t> entities);
+  void draw(CCamera &camera);
+  void init();
   glm::mat4 get_model(glm::vec3 pos);
 };
 

@@ -9,6 +9,7 @@ class nWindow {
 public:
   unsigned int width;
   unsigned int height;
+  bool open;
 
   nWindow();
   nWindow(unsigned int _width, unsigned int _height);
@@ -21,6 +22,7 @@ public:
   void mouseActiveCallback(void (*cb)(GLFWwindow *, int, int, int));
   void scrollCallback(void (*cb)(GLFWwindow *, double, double));
   void keyCallback(void (*cb)(GLFWwindow *, int, int, int, int));
+  void close();
 
 private:
   GLFWwindow *window;

@@ -5,6 +5,8 @@
 
 struct CTransform {
   glm::vec3 pos;
+  glm::vec3 forwards;
+  glm::vec3 up;
 };
 
 struct CCamera{

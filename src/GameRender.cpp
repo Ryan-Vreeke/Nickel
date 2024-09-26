@@ -1,4 +1,5 @@
 #include "GameRender.h"
+#include <GLFW/glfw3.h>
 
 nWindow::nWindow() {
   width = 800;
@@ -11,6 +12,11 @@ nWindow::nWindow(unsigned int _width, unsigned int _height)
 nWindow::~nWindow() {
   glfwDestroyWindow(window);
   glfwTerminate();
+}
+
+void nWindow::close(){
+  glfwWindowShouldClose(window);
+  glfwDestroyWindow(window);
 }
 
 int nWindow::init_window() {

@@ -37,4 +37,9 @@ void deleteEntities(std::vector<Entity> entities){
   }
 }
 
-void EntityManager::makeSystems() {}
+void EntityManager::makeSystems() {
+  render_system = RenderSystem();
+  render_system.init();
+  camera_system = SCamera();
+
+}
